@@ -27,4 +27,55 @@ void main() {
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
   });
+
+  testWidgets('App bar shows correct title', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    expect(find.text('Flutter Demo Home Page'), findsOneWidget);
+  });
+
+  testWidgets('Counter label is displayed', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    expect(
+      find.text('You have pushed the button this many times:'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Counter starts at zero', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    expect(find.text('0'), findsOneWidget);
+  });
+
+  testWidgets('Counter increments by 1 on each tap', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+    expect(find.text('1'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+    expect(find.text('2'), findsOneWidget);
+  });
+
+  testWidgets('FAB has Increment tooltip', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    final fab = find.byType(FloatingActionButton);
+    expect(fab, findsOneWidget);
+    expect(
+      tester.widget<FloatingActionButton>(fab).tooltip,
+      equals('Increment'),
+    );
+  });
+
+  testWidgets('Counter does not change without a tap', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.pump();
+    expect(find.text('0'), findsOneWidget);
+  });
 }
