@@ -1,9 +1,9 @@
-name: Distribute to Firebase App Distribution
+name: Deploy to Google Play Store
 
 on:
   push:
     branches:
-      - test
+      - main
   workflow_dispatch:
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       - name: Run tests
         run: flutter test
 
-  distribute:
+  deploy:
     runs-on: ubuntu-latest
     needs: test
 
@@ -52,8 +52,26 @@ jobs:
       - name: Get Flutter packages
         run: flutter pub get
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Decode keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+
+      - name: Write key.properties
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=$KEYSTORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=$KEY_ALIAS
+          storeFile=keystore.jks
+          EOF
+
+      - name: Build release AAB
+        run: flutter build appbundle --release
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -62,14 +80,9 @@ jobs:
           bundler-cache: true
           working-directory: android
 
-      - name: Write Firebase service account key
+      - name: Deploy to Play Store
         env:
-          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-        run: echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > /tmp/firebase-service-account.json
-
-      - name: Distribute to Firebase App Distribution
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-service-account.json
+          GOOGLE_PLAY_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY }}
         run: |
           cd android
-          bundle exec fastlane distribute
+          bundle exec fastlane deploy
