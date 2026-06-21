@@ -41,7 +41,7 @@ end
     lane :distribute do
         # build_android_app is a built-in fastlane action.
         release = firebase_app_distribution(
-            app: "1:210005321268:android:0fb5f8d7ff9c75d3658c61",
+            app: "1:210005321268:android:7eca692c641cce5f658c61",
             testers: "vishnukhandelwal1001@gmail.com, vishnu.khandelwal@mediologysoftware.com",
             android_artifact_type: "APK",
             android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
