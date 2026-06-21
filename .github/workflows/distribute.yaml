@@ -20,6 +20,13 @@ jobs:
           channel: 'stable'
           flutter-version: '3.44.1'
 
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
       - name: Get Flutter packages
         run: flutter pub get
 
@@ -49,11 +56,27 @@ jobs:
           channel: 'stable'
           flutter-version: '3.44.1'
 
+      - name: Cache pub dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-pub-
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
       - name: Get Flutter packages
         run: flutter pub get
 
       - name: Build release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --build-number=${{ github.run_number }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -70,6 +93,7 @@ jobs:
       - name: Distribute to Firebase App Distribution
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-service-account.json
+          RELEASE_NOTES: ${{ github.event.head_commit.message }}
         run: |
           cd android
           bundle exec fastlane distribute
@@ -91,7 +115,7 @@ jobs:
           subject: "New Build Available for QA - ${{ github.repository }} (${{ github.ref_name }})"
           to: ${{ secrets.QA_TEAM_EMAILS }}
           cc: ${{ secrets.CC_EMAILS }}
-          from: Build Bot <${{ secrets.MAIL_USERNAME }}>
+          from: Vishnu <${{ secrets.MAIL_USERNAME }}>
           body: |
             Hi Team,
 
@@ -102,9 +126,11 @@ jobs:
             Triggered by : ${{ github.actor }}
             Workflow run : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
+            Build Number : ${{ github.run_number }}
+
             Please check your Firebase App Distribution invite/email to download and test the build.
 
-            Release Notes: Lots of amazing new features to test out!
+            Release Notes: ${{ github.event.head_commit.message }}
 
             Thanks,
-            CI/CD Bot
+            Vishnu

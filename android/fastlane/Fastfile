@@ -45,7 +45,7 @@ end
             testers: "vishnukhandelwal1001@gmail.com, vishnu.khandelwal@mediologysoftware.com",
             android_artifact_type: "APK",
             android_artifact_path: "../build/app/outputs/flutter-apk/app-release.apk",
-            release_notes: "Lots of amazing new features to test out!"
+            release_notes: ENV["RELEASE_NOTES"] || "Lots of amazing new features to test out!"
         )
     end
 
