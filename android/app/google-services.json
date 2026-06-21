@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:210005321268:android:7eca692c641cce5f658c61",
+        "android_client_info": {
+          "package_name": "com.cicdauto.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJv_vtcRhzI8o8vp0CHTlVhsyMqZVWmeM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:210005321268:android:0fb5f8d7ff9c75d3658c61",
         "android_client_info": {
           "package_name": "com.example.ci_cd_example"
