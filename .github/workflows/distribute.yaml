@@ -73,3 +73,38 @@ jobs:
         run: |
           cd android
           bundle exec fastlane distribute
+
+  notify:
+    name: Notify QA Team
+    needs: distribute
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Send email to QA team
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "New Build Available for QA - ${{ github.repository }} (${{ github.ref_name }})"
+          to: ${{ secrets.QA_TEAM_EMAILS }}
+          cc: ${{ secrets.CC_EMAILS }}
+          from: Build Bot <${{ secrets.MAIL_USERNAME }}>
+          body: |
+            Hi Team,
+
+            A new build has been successfully distributed via Firebase App Distribution.
+
+            Branch       : ${{ github.ref_name }}
+            Commit       : ${{ github.sha }}
+            Triggered by : ${{ github.actor }}
+            Workflow run : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Please check your Firebase App Distribution invite/email to download and test the build.
+
+            Release Notes: Lots of amazing new features to test out!
+
+            Thanks,
+            CI/CD Bot
